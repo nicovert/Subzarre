@@ -2,7 +2,7 @@
 	if(isset($_POST['submit'])) {
 		//form submission save
 		if (!isset($_POST['id']) || !isset($_POST['content']) || !isset($_POST['arrange'])
-			|| !isset($_POST['name']) || !isset($_POST['url']) || !isset($_POST['date'])) {
+			|| !isset($_POST['name']) || !isset($_POST['date'])) {
 			echo "<script>alert('Error: Missing Required Field(s)');</script>";
 		}
 		if (!isset($_POST['raceEth']) || $_POST['raceEth']=="") {
@@ -21,10 +21,16 @@
 			$subGen = "'" . $_POST['gender'] . "'";
 		}
 
+		//download profile image to save to /images/
+		if (isset($_POST['url']) && $_POST['url']!="" && isset($_POST['id'])) {
+			$imageFile = "images/{$_POST['id']}.jpg";
+			file_put_contents($imageFile, file_get_contents($_POST['url']));
+		}
+
+		//write to database
 		$db = new PDO('sqlite:subzarre.db');
 		$sqlUpdateChannel = "UPDATE channel
 							 SET name='{$_POST['name']}',
-							 thumbURL='{$_POST['url']}',
 							 subscribeDate='{$_POST['date']}'
 							 WHERE id='{$_POST['id']}'";
 
@@ -48,7 +54,7 @@
 	if (isset($_POST['delete'])) {
 		//form submission delete
 		if (!isset($_POST['id']) || !isset($_POST['content']) || !isset($_POST['arrange'])
-			|| !isset($_POST['name']) || !isset($_POST['url']) || !isset($_POST['date'])) {
+			|| !isset($_POST['name']) || !isset($_POST['date'])) {
 			echo "<script>alert('Error: Missing Required Field(s)');</script>";
 		}
 
@@ -58,9 +64,15 @@
 		$resultDelete=$db->query($sqlDelete);
 		$resultDeleteTags=$db->query($sqlDeleteTags);
 		if ($resultDelete == TRUE && $resultDeleteTags == TRUE) {
-			echo "<script>alert('Subscription Deleted Succesfully');</script>";
-			header('Location: index.php');
-			exit;
+			if (!unlink("images/{$_POST['id']}.jpg")) {
+				echo "<script>alert('Subscription Deleted Succesfully\nError Deleting Profile Image');</script>";
+				header('Location: index.php');
+				exit;
+			} else {
+				echo "<script>alert('Subscription Deleted Succesfully');</script>";
+				header('Location: index.php');
+				exit;
+			}
 		} else {
 			echo "<script>alert('Error Deleting Subscription');</script>";
 		}
@@ -170,7 +182,12 @@
 
 			$("#inUrl").change(function() {
 				// update picture preview from url
-				$("#imagePreview").attr("src",document.getElementById("inUrl").value);
+				if (!document.getElementById("inUrl").value
+					|| document.getElementById("inUrl").value === "") {
+					$("#imagePreview").attr("src","images/"+document.getElementById("inid").value);
+				} else {
+					$("#imagePreview").attr("src",document.getElementById("inUrl").value);
+				}
 			});
 
 			$("#buttonDelete").click(function() {
@@ -203,7 +220,6 @@
 			foreach ($rows as $row) {
 				$channelID = $row['id'];
 				$channelName = $row['name'];
-				$url = $row['thumbURL'];
 				$date = $row['subscribeDate'];
 				$content = $row['content'];
 				$arrange = $row['arrangement'];
@@ -242,11 +258,11 @@
 			<label for="name">Channel Name:</label><br>
 			<input type="text" name="name" id="inName" class="inputs" size="24" value="<?php echo($channelName);?>" required><span class="required">*</span><br><br>
 			<label for="url">Profile Picture (URL):</label><br>
-			<input type="text" name="url" id="inUrl" class="inputs" size="24" value="<?php echo($url);?>" required><span class="required">*</span>
+			<input type="text" name="url" id="inUrl" class="inputs" size="24" value="">
 			
 			<img src="" id="imagePreview" width="50" height="50" title="Image Preview" /><br>
 			<script type="text/javascript">
-				$("#imagePreview").attr("src",document.getElementById("inUrl").value);
+				$("#imagePreview").attr("src","images/"+document.getElementById("inid").value)+"<?php echo time();?>";
 			</script>
 
 			<label for="date">Subscribed Date:</label><br>

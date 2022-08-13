@@ -21,10 +21,16 @@
 			$subGen = "'" . $_POST['gender'] . "'";
 		}
 
+		//download profile image to save to /images/
+		if (isset($_POST['url']) && $_POST['url']!="" && isset($_POST['id'])) {
+			$imageFile = "images/{$_POST['id']}.jpg";
+			file_put_contents($imageFile, file_get_contents($_POST['url']));
+		}
+
 		$db = new PDO('sqlite:subzarre.db');
-		$sqlNew = "INSERT INTO channel (id,name,thumbURL,subscribeDate)
+		$sqlNew = "INSERT INTO channel (id,name,subscribeDate)
 				   VALUES
-				   ('{$_POST['id']}','{$_POST['name']}','{$_POST['url']}','{$_POST['date']}')";
+				   ('{$_POST['id']}','{$_POST['name']}','{$_POST['date']}')";
 
 		$sqlNewTags = "INSERT INTO tags (channelID,content,arrangement,raceEthnicity,nationality,gender)
 					   VALUES

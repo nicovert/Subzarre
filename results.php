@@ -37,7 +37,6 @@
 				$sql = "select * from channel join tags on channel.id = tags.channelID 
 							where id like ('{$_GET['search']}')
 								OR name like ('%{$_GET['search']}%')
-								OR thumbURL like ('{$_GET['search']}')
 								OR subscribeDate like ('%{$_GET['search']}%')
 								OR content like ('%{$_GET['search']}%')
 								OR raceEthnicity like ('%{$_GET['search']}%')
@@ -52,7 +51,6 @@
 				$sql = "select * from channel join tags on channel.id = tags.channelID 
 							where id not like '%{$searchMinus}%'
 								and (name not like '%{$searchMinus}%' or name is null)
-								and (thumbURL not like '%{$searchMinus}%' or thumbURL is null)
 								and (subscribeDate not like '%{$searchMinus}%' or subscribeDate is null)
 								and (content not like '%{$searchMinus}%' or content is null)
 								and (raceEthnicity not like '%{$searchMinus}%' or raceEthnicity is null)
@@ -140,7 +138,7 @@
 
 				<li>
 					<div class="panelChannel">
-						<a href="https://www.youtube.com/channel/<?php echo($row['id']);?>"><img src="<?php echo($row['thumbURL']);?>" width="100%"></a>
+						<a href="https://www.youtube.com/channel/<?php echo($row['id']);?>"><img src="images/<?php echo($row['id']);?>?v=<?php echo time();?>" width="100%"></a>
 						<strong><?php echo($row['name']);?></strong>
 						<div class="panelTags">
 							<p>Subscribed Date:<br><?php echo($row['subscribeDate']);?></p>
