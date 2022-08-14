@@ -1,6 +1,13 @@
 <?php
 	$db = new PDO('sqlite:subzarre.db');
 
+	//total subscriptions
+	$totalSQL = "select count(*) from channel";
+	$totalResult = $db->query($totalSQL);
+	$totalRows = $totalResult->fetchAll();
+	$totalRow = $totalRows[0];
+	$total = $totalRow[0];
+
 	// comma seperated, array, unique
 	// race/ethnicity
 	$reSQL = "select raceEthnicity from tags where content not like '%secondchannel%'";
@@ -88,6 +95,14 @@
 			margin-right: 50px;
 			align-items: center;
 		}
+		.total {
+			display: flex;
+			justify-content: center;
+		}
+		.totalText {
+			padding: 5px 10px;
+			border-bottom: 1px solid #C7CBCF;
+		}
 		.button {
 			background-color: #323639;
 			color: #C7CBCF;
@@ -122,6 +137,11 @@
 			<!-- search -->
 			<a href="index.php"><button class="button" id="buttonHome">Home</button></a>
 		</div>
+	</div>
+
+	<!-- total -->
+	<div class="total">
+		<h2 class="totalText">Total Subcriptions: <?php echo($total);?></h2>
 	</div>
 
 	<!-- charts -->
